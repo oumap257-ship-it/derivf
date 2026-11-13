@@ -1,0 +1,2540 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Deriv · Forex Trading</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #0b0e14;
+            color: #e6eaef;
+            line-height: 1.5;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        .app {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 16px 20px 40px;
+        }
+
+        /* Header */
+        .topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 16px;
+            margin-bottom: 20px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid #1e2633;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo i {
+            font-size: 28px;
+            color: #3b9eff;
+        }
+
+        .logo h1 {
+            font-size: 24px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, #fff 0%, #9ab8e0 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .logo span {
+            font-size: 12px;
+            font-weight: 400;
+            color: #7f8c9b;
+            -webkit-text-fill-color: #7f8c9b;
+            margin-left: 4px;
+        }
+
+        .user-area {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .balance-badge {
+            background: #151e2b;
+            padding: 8px 16px;
+            border-radius: 40px;
+            border: 1px solid #2b3a4f;
+            font-weight: 600;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.2s;
+        }
+
+        .balance-badge i {
+            color: #f0b90b;
+        }
+
+        .balance-badge .amount {
+            color: #fff;
+            font-weight: 700;
+        }
+
+        .balance-badge.demo-badge {
+            border-color: #00c87a;
+            background: #0f1f1a;
+        }
+
+        .balance-badge.demo-badge i {
+            color: #00c87a;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background: #1e2b3c;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            color: #3b9eff;
+            border: 1px solid #2b3a4f;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .avatar:hover {
+            border-color: #3b9eff;
+        }
+
+        /* Account switcher */
+        .account-switcher {
+            display: flex;
+            gap: 0;
+            background: #0d1620;
+            border-radius: 40px;
+            border: 1px solid #1e2e40;
+            padding: 3px;
+            margin-bottom: 20px;
+            width: fit-content;
+        }
+
+        .acc-tab {
+            background: transparent;
+            border: none;
+            padding: 10px 24px;
+            border-radius: 30px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #7f8fa0;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .acc-tab i {
+            font-size: 14px;
+        }
+
+        .acc-tab.active {
+            background: #1e2e42;
+            color: #fff;
+        }
+
+        .acc-tab.active.demo-tab {
+            background: #0f2a1f;
+            color: #00c87a;
+        }
+
+        .acc-tab.active.live-tab {
+            background: #1a2a3f;
+            color: #3b9eff;
+        }
+
+        .acc-tab .badge {
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 20px;
+            background: #253b50;
+            color: #9ab8e0;
+            font-weight: 600;
+            margin-left: 4px;
+        }
+
+        .acc-tab.active.demo-tab .badge {
+            background: #00c87a;
+            color: #0b1a12;
+        }
+
+        .acc-tab.active.live-tab .badge {
+            background: #3b9eff;
+            color: #0b1628;
+        }
+
+        /* Main grid */
+        .dashboard {
+            display: grid;
+            grid-template-columns: 1fr 340px;
+            gap: 24px;
+            margin-bottom: 24px;
+        }
+
+        @media (max-width: 900px) {
+            .dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Chart card */
+        .card {
+            background: #111a24;
+            border-radius: 20px;
+            border: 1px solid #1f2b3a;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Markets section */
+        .markets-section {
+            margin-bottom: 16px;
+        }
+
+        .markets-title {
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.6px;
+            color: #6b8099;
+            font-weight: 600;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .markets-title i {
+            font-size: 12px;
+            color: #3b9eff;
+        }
+
+        .pair-selector {
+            display: flex;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        .pair-btn {
+            background: transparent;
+            border: 1px solid #253241;
+            color: #b0c0d0;
+            padding: 8px 14px;
+            border-radius: 30px;
+            font-weight: 500;
+            font-size: 12.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .pair-btn.active {
+            background: #3b9eff;
+            border-color: #3b9eff;
+            color: #fff;
+            font-weight: 600;
+        }
+
+        .pair-btn:hover {
+            background: #1c2b3c;
+            border-color: #3b9eff;
+        }
+
+        .pair-btn.active:hover {
+            background: #2a8af0;
+        }
+
+        /* Chart header */
+        .chart-header {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 16px;
+            gap: 12px;
+        }
+
+        .price-display {
+            display: flex;
+            align-items: baseline;
+            gap: 8px;
+        }
+
+        .current-price {
+            font-size: 28px;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+        }
+
+        .change {
+            font-size: 14px;
+            font-weight: 600;
+            padding: 4px 10px;
+            border-radius: 30px;
+        }
+
+        .change.up {
+            background: rgba(0, 200, 100, 0.15);
+            color: #00c87a;
+        }
+
+        .change.down {
+            background: rgba(255, 70, 70, 0.15);
+            color: #ff4b4b;
+        }
+
+        /* Chart range controls */
+        .chart-controls {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+            margin-bottom: 10px;
+        }
+
+        .range-btns {
+            display: flex;
+            gap: 4px;
+            background: #0d1620;
+            border-radius: 30px;
+            padding: 3px;
+            border: 1px solid #1e2e40;
+        }
+
+        .range-btn {
+            background: transparent;
+            border: none;
+            color: #7f8fa0;
+            padding: 6px 14px;
+            border-radius: 30px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+
+        .range-btn.active {
+            background: #1e2e42;
+            color: #fff;
+        }
+
+        .range-btn:hover {
+            color: #fff;
+        }
+
+        .chart-hint {
+            font-size: 11.5px;
+            color: #6b8099;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .chart-hint i {
+            color: #3b9eff;
+            font-size: 12px;
+        }
+
+        .chart-container {
+            position: relative;
+            height: 320px;
+            width: 100%;
+        }
+
+        .chart-container canvas {
+            max-height: 100%;
+            width: 100% !important;
+        }
+
+        /* Deposit panel */
+        .deposit-panel {
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .deposit-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 6px;
+        }
+
+        .deposit-header i {
+            color: #0070ba;
+            font-size: 24px;
+        }
+
+        .deposit-header h2 {
+            font-size: 18px;
+            font-weight: 600;
+            color: #eef2f7;
+        }
+
+        .paypal-badge {
+            background: #003087;
+            border-radius: 8px;
+            padding: 4px 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: #fff;
+            letter-spacing: 0.3px;
+        }
+
+        .deposit-info {
+            background: #0d1620;
+            border-radius: 14px;
+            padding: 16px;
+            border: 1px solid #1e2e40;
+            font-size: 14px;
+            color: #a6b8cc;
+        }
+
+        .deposit-info p {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+
+        .deposit-info p:last-child {
+            margin-bottom: 0;
+        }
+
+        .deposit-info .label {
+            color: #7f8fa0;
+        }
+
+        .deposit-info .value {
+            font-weight: 600;
+            color: #e0e9f2;
+        }
+
+        .amount-input {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .amount-input label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #8f9fb0;
+            letter-spacing: 0.2px;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            background: #0d1620;
+            border: 1px solid #253b50;
+            border-radius: 14px;
+            padding: 4px 4px 4px 18px;
+            transition: border 0.2s;
+        }
+
+        .input-group:focus-within {
+            border-color: #3b9eff;
+            box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.15);
+        }
+
+        .input-group span {
+            font-size: 18px;
+            font-weight: 600;
+            color: #5f7a99;
+        }
+
+        .input-group input {
+            background: transparent;
+            border: none;
+            padding: 14px 12px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #fff;
+            width: 100%;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .input-group input::placeholder {
+            color: #3b4c60;
+            font-weight: 400;
+        }
+
+        .quick-amounts {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .quick-btn {
+            background: #0d1620;
+            border: 1px solid #1e3040;
+            color: #b0c4da;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-size: 13px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            flex: 1;
+            min-width: 60px;
+        }
+
+        .quick-btn:hover {
+            background: #1a2b3d;
+            border-color: #3b9eff;
+            color: #fff;
+        }
+
+        .btn-paypal {
+            background: #0070ba;
+            border: none;
+            border-radius: 40px;
+            padding: 16px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 4px;
+            box-shadow: 0 8px 20px rgba(0, 112, 186, 0.3);
+            letter-spacing: 0.3px;
+        }
+
+        .btn-paypal i {
+            font-size: 20px;
+        }
+
+        .btn-paypal:hover {
+            background: #005ea0;
+        }
+
+        .btn-paypal:active {
+            transform: scale(0.98);
+        }
+
+        .btn-paypal:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-withdraw {
+            background: #1e2e42;
+            border: 1px solid #3b9eff;
+            border-radius: 40px;
+            padding: 14px 24px;
+            font-size: 15px;
+            font-weight: 600;
+            color: #3b9eff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 2px;
+            letter-spacing: 0.2px;
+        }
+
+        .btn-withdraw:hover {
+            background: #253b55;
+            color: #5aaeff;
+        }
+
+        .btn-withdraw:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .notice {
+            font-size: 12px;
+            color: #6b7e92;
+            text-align: center;
+            margin-top: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+
+        .notice i {
+            font-size: 12px;
+        }
+
+        /* Demo banner */
+        .demo-banner {
+            background: #0f1f1a;
+            border: 1px solid #1e4a35;
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #8fd4b0;
+        }
+
+        .demo-banner i {
+            color: #00c87a;
+            font-size: 18px;
+        }
+
+        .demo-banner .demo-amount {
+            font-weight: 700;
+            color: #00c87a;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        /* Live locked banner */
+        .live-locked {
+            background: #1a1a0f;
+            border: 1px solid #4a4020;
+            border-radius: 14px;
+            padding: 12px 16px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 13px;
+            color: #d4b88f;
+        }
+
+        .live-locked i {
+            color: #f0b90b;
+            font-size: 18px;
+        }
+
+        .live-locked .locked-text {
+            font-weight: 600;
+            color: #f0b90b;
+            margin-left: auto;
+            white-space: nowrap;
+        }
+
+        /* Trading stats */
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-top: 16px;
+        }
+
+        .stat-item {
+            background: #0d1620;
+            border-radius: 14px;
+            padding: 14px 12px;
+            border: 1px solid #1a2938;
+            text-align: center;
+        }
+
+        .stat-label {
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #6b8099;
+            margin-bottom: 6px;
+        }
+
+        .stat-value {
+            font-weight: 700;
+            font-size: 16px;
+            color: #e0eaf5;
+        }
+
+        .stat-value.green {
+            color: #00c87a;
+        }
+
+        .stat-value.red {
+            color: #ff5e5e;
+        }
+
+        /* Toast notification */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1f2e42;
+            color: #fff;
+            padding: 14px 28px;
+            border-radius: 60px;
+            font-weight: 500;
+            font-size: 14px;
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.6);
+            border: 1px solid #3b9eff;
+            opacity: 0;
+            transition: all 0.35s cubic-bezier(0.2, 0.9, 0.3, 1);
+            z-index: 3000;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            pointer-events: none;
+            white-space: nowrap;
+            max-width: 90vw;
+        }
+
+        .toast.show {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
+        }
+
+        .toast i {
+            color: #3b9eff;
+            font-size: 18px;
+        }
+
+        .toast.success i {
+            color: #00c87a;
+        }
+
+        .toast.error i {
+            color: #ff5e5e;
+        }
+
+        /* ========== AUTH MODAL ========== */
+        .auth-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(4, 8, 15, 0.85);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            z-index: 2000;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease;
+        }
+
+        .auth-overlay.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-modal {
+            background: #111a24;
+            border: 1px solid #24384f;
+            border-radius: 24px;
+            padding: 32px;
+            max-width: 460px;
+            width: 100%;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.8);
+            transform: translateY(20px) scale(0.98);
+            transition: transform 0.3s cubic-bezier(0.2, 0.9, 0.3, 1);
+            position: relative;
+        }
+
+        .auth-overlay.open .auth-modal {
+            transform: translateY(0) scale(1);
+        }
+
+        .auth-modal::-webkit-scrollbar {
+            width: 5px;
+        }
+        .auth-modal::-webkit-scrollbar-thumb {
+            background: #2a3f55;
+            border-radius: 10px;
+        }
+
+        .auth-modal .close-btn {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: #1a2a3c;
+            border: 1px solid #2a3f55;
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: #9ab8e0;
+            font-size: 16px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .auth-modal .close-btn:hover {
+            background: #253b50;
+            color: #fff;
+            border-color: #3b9eff;
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .auth-header .auth-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 16px;
+            background: linear-gradient(135deg, #1a3a5c, #0f2a44);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #2a4a6a;
+        }
+
+        .auth-header .auth-icon i {
+            font-size: 30px;
+            color: #3b9eff;
+        }
+
+        .auth-header h2 {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: -0.4px;
+            margin-bottom: 6px;
+        }
+
+        .auth-header p {
+            font-size: 14px;
+            color: #8f9fb0;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .form-field label {
+            font-size: 13px;
+            font-weight: 500;
+            color: #9fb2c6;
+            letter-spacing: 0.2px;
+        }
+
+        .form-field .field-input {
+            display: flex;
+            align-items: center;
+            background: #0d1620;
+            border: 1px solid #253b50;
+            border-radius: 12px;
+            padding: 0 4px 0 14px;
+            transition: border 0.2s, box-shadow 0.2s;
+        }
+
+        .form-field .field-input:focus-within {
+            border-color: #3b9eff;
+            box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.12);
+        }
+
+        .form-field .field-input i {
+            color: #5f7a99;
+            font-size: 15px;
+            width: 20px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .form-field .field-input input {
+            background: transparent;
+            border: none;
+            padding: 13px 12px;
+            font-size: 15px;
+            color: #fff;
+            width: 100%;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .form-field .field-input input::placeholder {
+            color: #3b4c60;
+            font-weight: 400;
+        }
+
+        .field-hint {
+            font-size: 11.5px;
+            color: #6b8099;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .field-hint i {
+            font-size: 11px;
+        }
+
+        .verify-options {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .verify-opt {
+            flex: 1;
+            min-width: 130px;
+            background: #0d1620;
+            border: 1.5px solid #253b50;
+            border-radius: 12px;
+            padding: 12px 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-family: 'Inter', sans-serif;
+            color: #9fb2c6;
+            font-size: 13.5px;
+            font-weight: 500;
+        }
+
+        .verify-opt i {
+            font-size: 16px;
+            color: #5f7a99;
+        }
+
+        .verify-opt:hover {
+            border-color: #3b6a9e;
+            background: #12202e;
+        }
+
+        .verify-opt.selected {
+            border-color: #3b9eff;
+            background: #102438;
+            color: #fff;
+        }
+
+        .verify-opt.selected i {
+            color: #3b9eff;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #3b9eff, #1a7ae0);
+            border: none;
+            border-radius: 40px;
+            padding: 15px 24px;
+            font-size: 16px;
+            font-weight: 700;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            cursor: pointer;
+            transition: background 0.2s, transform 0.1s;
+            font-family: 'Inter', sans-serif;
+            margin-top: 6px;
+            box-shadow: 0 8px 24px rgba(59, 158, 255, 0.3);
+            letter-spacing: 0.2px;
+        }
+
+        .btn-primary:hover {
+            background: linear-gradient(135deg, #4aa8ff, #2a8af0);
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .auth-footer {
+            text-align: center;
+            font-size: 13px;
+            color: #6b8099;
+            margin-top: 16px;
+        }
+
+        .auth-footer a {
+            color: #3b9eff;
+            text-decoration: none;
+            font-weight: 600;
+            cursor: pointer;
+        }
+
+        .auth-footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* Code input styling */
+        .code-input-wrap {
+            display: flex;
+            gap: 8px;
+            justify-content: center;
+            margin: 8px 0;
+        }
+
+        .code-digit {
+            width: 48px;
+            height: 56px;
+            background: #0d1620;
+            border: 1.5px solid #253b50;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 22px;
+            font-weight: 700;
+            color: #fff;
+            outline: none;
+            font-family: 'Inter', sans-serif;
+            transition: all 0.2s;
+        }
+
+        .code-digit:focus {
+            border-color: #3b9eff;
+            box-shadow: 0 0 0 3px rgba(59, 158, 255, 0.15);
+        }
+
+        .code-digit.filled {
+            border-color: #3b9eff;
+            background: #102438;
+        }
+
+        .resend-row {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            font-size: 13px;
+            color: #6b8099;
+            margin-top: 4px;
+        }
+
+        .resend-row a {
+            color: #3b9eff;
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+
+        .resend-row a.disabled {
+            color: #3b4c60;
+            pointer-events: none;
+        }
+
+        .resend-row a:hover {
+            text-decoration: underline;
+        }
+
+        .verify-target {
+            background: #0f1c28;
+            border: 1px solid #1e3a55;
+            border-radius: 12px;
+            padding: 12px 16px;
+            font-size: 13px;
+            color: #8fbfe8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 4px;
+        }
+
+        .verify-target i {
+            color: #3b9eff;
+            font-size: 16px;
+        }
+
+        .verify-target strong {
+            color: #d0e4f8;
+            font-weight: 600;
+            word-break: break-all;
+        }
+
+        .email-preview {
+            background: #0a121c;
+            border: 1px solid #1e3a55;
+            border-radius: 12px;
+            padding: 14px;
+            margin-top: 4px;
+            font-size: 12.5px;
+            color: #a6b8cc;
+        }
+
+        .email-preview .ep-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #1a2a3a;
+            color: #8fa6c0;
+            font-weight: 600;
+            font-size: 11px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .email-preview .ep-header i {
+            color: #3b9eff;
+        }
+
+        .email-preview .ep-body {
+            line-height: 1.7;
+        }
+
+        .email-preview .ep-code {
+            display: inline-block;
+            background: #1a3a5c;
+            color: #fff;
+            font-weight: 800;
+            font-size: 18px;
+            letter-spacing: 4px;
+            padding: 8px 16px;
+            border-radius: 8px;
+            margin: 6px 0;
+            font-family: 'Inter', monospace;
+        }
+
+        /* User dropdown menu */
+        .user-menu {
+            position: absolute;
+            top: 68px;
+            right: 20px;
+            background: #111a24;
+            border: 1px solid #24384f;
+            border-radius: 16px;
+            padding: 8px;
+            min-width: 240px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7);
+            z-index: 1500;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-8px);
+            transition: all 0.2s;
+        }
+
+        .user-menu.open {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .user-menu-header {
+            padding: 12px 14px;
+            border-bottom: 1px solid #1e2e40;
+            margin-bottom: 6px;
+        }
+
+        .user-menu-header .um-name {
+            font-weight: 700;
+            font-size: 14px;
+            color: #fff;
+        }
+
+        .user-menu-header .um-email {
+            font-size: 12px;
+            color: #7f8fa0;
+            margin-top: 2px;
+            word-break: break-all;
+        }
+
+        .user-menu-header .um-verified {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 11px;
+            color: #00c87a;
+            margin-top: 6px;
+            background: rgba(0, 200, 100, 0.1);
+            padding: 3px 8px;
+            border-radius: 20px;
+            font-weight: 600;
+        }
+
+        .user-menu-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 14px;
+            border-radius: 10px;
+            font-size: 13.5px;
+            color: #b0c4da;
+            cursor: pointer;
+            transition: all 0.15s;
+            font-family: 'Inter', sans-serif;
+            border: none;
+            background: transparent;
+            width: 100%;
+            text-align: left;
+        }
+
+        .user-menu-item:hover {
+            background: #1a2b3d;
+            color: #fff;
+        }
+
+        .user-menu-item i {
+            width: 18px;
+            text-align: center;
+            color: #7f8fa0;
+            font-size: 14px;
+        }
+
+        .user-menu-item:hover i {
+            color: #3b9eff;
+        }
+
+        .user-menu-item.danger {
+            color: #ff7a7a;
+        }
+
+        .user-menu-item.danger i {
+            color: #ff5e5e;
+        }
+
+        .user-menu-item.danger:hover {
+            background: #2a1a1a;
+        }
+
+        /* Responsive tweaks */
+        @media (max-width: 600px) {
+            .app {
+                padding: 12px 14px 30px;
+            }
+
+            .topbar {
+                margin-bottom: 12px;
+            }
+
+            .logo h1 {
+                font-size: 20px;
+            }
+
+            .balance-badge {
+                padding: 6px 12px;
+                font-size: 12px;
+            }
+
+            .current-price {
+                font-size: 22px;
+            }
+
+            .chart-container {
+                height: 240px;
+            }
+
+            .card {
+                padding: 16px;
+                border-radius: 16px;
+            }
+
+            .stats-row {
+                grid-template-columns: 1fr 1fr;
+            }
+
+            .stats-row .stat-item:last-child {
+                grid-column: span 2;
+            }
+
+            .account-switcher {
+                width: 100%;
+            }
+
+            .acc-tab {
+                flex: 1;
+                justify-content: center;
+                padding: 10px 12px;
+                font-size: 13px;
+            }
+
+            .auth-modal {
+                padding: 24px 20px;
+            }
+
+            .code-digit {
+                width: 40px;
+                height: 48px;
+                font-size: 18px;
+            }
+
+            .verify-options {
+                flex-direction: column;
+            }
+
+            .user-menu {
+                right: 10px;
+                left: 10px;
+                min-width: auto;
+            }
+
+            .range-btn {
+                padding: 5px 10px;
+                font-size: 11px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .user-area {
+                gap: 12px;
+            }
+            .balance-badge .amount {
+                font-size: 13px;
+            }
+            .pair-btn {
+                padding: 6px 10px;
+                font-size: 11.5px;
+            }
+            .acc-tab {
+                font-size: 11px;
+                padding: 8px 8px;
+            }
+            .acc-tab i {
+                display: none;
+            }
+            .code-digit {
+                width: 36px;
+                height: 44px;
+                font-size: 16px;
+            }
+        }
+
+        /* Custom scrollbar for a polished look */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0b0e14;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #253b50;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="app">
+        <!-- Header -->
+        <header class="topbar">
+            <div class="logo">
+                <i class="fas fa-chart-line"></i>
+                <h1>Deriv<span>forex</span></h1>
+            </div>
+            <div class="user-area">
+                <div class="balance-badge" id="balanceBadge">
+                    <i class="fas fa-wallet"></i>
+                    <span class="amount" id="balanceDisplay">$10,000.00</span>
+                </div>
+                <div class="avatar" id="avatarBtn" title="Account">JD</div>
+            </div>
+        </header>
+
+        <!-- User dropdown menu -->
+        <div class="user-menu" id="userMenu">
+            <div class="user-menu-header">
+                <div class="um-name" id="umName">John Doe</div>
+                <div class="um-email" id="umEmail">john@example.com</div>
+                <div class="um-verified" id="umVerified">
+                    <i class="fas fa-check-circle"></i> Verified
+                </div>
+            </div>
+            <button class="user-menu-item" id="menuProfile">
+                <i class="fas fa-user-circle"></i> Profile
+            </button>
+            <button class="user-menu-item" id="menuSecurity">
+                <i class="fas fa-shield-alt"></i> Security
+            </button>
+            <button class="user-menu-item danger" id="menuLogout">
+                <i class="fas fa-sign-out-alt"></i> Sign out
+            </button>
+        </div>
+
+        <!-- Account switcher -->
+        <div class="account-switcher" id="accountSwitcher">
+            <button class="acc-tab demo-tab active" data-account="demo">
+                <i class="fas fa-flask"></i> Demo
+                <span class="badge">virtual</span>
+            </button>
+            <button class="acc-tab live-tab" data-account="live">
+                <i class="fas fa-bolt"></i> Live
+                <span class="badge" id="liveBadge">locked</span>
+            </button>
+        </div>
+
+        <!-- Main dashboard -->
+        <div class="dashboard">
+            <!-- Left column: Chart -->
+            <div class="card">
+                <!-- Markets section with more pairs -->
+                <div class="markets-section">
+                    <div class="markets-title">
+                        <i class="fas fa-globe"></i> Markets
+                    </div>
+                    <div class="pair-selector" id="pairSelector">
+                        <button class="pair-btn active" data-pair="EURUSD">EUR/USD</button>
+                        <button class="pair-btn" data-pair="GBPUSD">GBP/USD</button>
+                        <button class="pair-btn" data-pair="USDJPY">USD/JPY</button>
+                        <button class="pair-btn" data-pair="AUDUSD">AUD/USD</button>
+                        <button class="pair-btn" data-pair="USDCAD">USD/CAD</button>
+                        <button class="pair-btn" data-pair="USDCHF">USD/CHF</button>
+                        <button class="pair-btn" data-pair="NZDUSD">NZD/USD</button>
+                        <button class="pair-btn" data-pair="EURGBP">EUR/GBP</button>
+                        <button class="pair-btn" data-pair="EURJPY">EUR/JPY</button>
+                        <button class="pair-btn" data-pair="GBPJPY">GBP/JPY</button>
+                    </div>
+                </div>
+
+                <div class="chart-header">
+                    <div class="price-display">
+                        <span class="current-price" id="currentPrice">1.0924</span>
+                        <span class="change up" id="priceChange">+0.23%</span>
+                    </div>
+                </div>
+
+                <!-- Chart range controls -->
+                <div class="chart-controls">
+                    <div class="range-btns" id="rangeBtns">
+                        <button class="range-btn" data-range="1h">1H</button>
+                        <button class="range-btn active" data-range="1d">1D</button>
+                        <button class="range-btn" data-range="2d">2D</button>
+                        <button class="range-btn" data-range="1w">1W</button>
+                    </div>
+                    <div class="chart-hint">
+                        <i class="fas fa-arrows-alt-h"></i> Drag chart to scroll back
+                    </div>
+                </div>
+
+                <div class="chart-container">
+                    <canvas id="forexChart"></canvas>
+                </div>
+
+                <!-- Quick trading stats -->
+                <div class="stats-row">
+                    <div class="stat-item">
+                        <div class="stat-label">24h High</div>
+                        <div class="stat-value" id="high24">1.0948</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">24h Low</div>
+                        <div class="stat-value" id="low24">1.0882</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-label">Volume</div>
+                        <div class="stat-value" id="volume24">142.8K</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right column: Deposit panel -->
+            <div class="card deposit-panel">
+                <div class="deposit-header">
+                    <i class="fab fa-paypal"></i>
+                    <h2>Deposit funds</h2>
+                    <span class="paypal-badge">PayPal</span>
+                </div>
+
+                <!-- Demo banner (shown in demo) -->
+                <div class="demo-banner" id="demoBanner">
+                    <i class="fas fa-flask"></i>
+                    <span>Demo account active — training mode</span>
+                    <span class="demo-amount" id="demoBalanceTag">$10,000 virtual</span>
+                </div>
+
+                <!-- Live locked banner (shown in live if no deposit) -->
+                <div class="live-locked" id="liveLockedBanner" style="display:none;">
+                    <i class="fas fa-lock"></i>
+                    <span>Live account locked</span>
+                    <span class="locked-text">Deposit to unlock</span>
+                </div>
+
+                <div class="deposit-info">
+                    <p>
+                        <span class="label">Account</span>
+                        <span class="value" id="accountLabel">JD · Demo</span>
+                    </p>
+                    <p>
+                        <span class="label">Status</span>
+                        <span class="value" style="color:#00c87a;" id="accountStatus">● Training</span>
+                    </p>
+                    <p>
+                        <span class="label">Method</span>
+                        <span class="value"><i class="fab fa-paypal" style="color:#0070ba; margin-right:4px;"></i> PayPal</span>
+                    </p>
+                </div>
+
+                <div class="amount-input">
+                    <label>Amount (USD)</label>
+                    <div class="input-group">
+                        <span>$</span>
+                        <input type="number" id="depositAmount" placeholder="0.00" min="5" step="1" value="100">
+                    </div>
+                </div>
+
+                <div class="quick-amounts">
+                    <button class="quick-btn" data-amount="5">$5</button>
+                    <button class="quick-btn" data-amount="50">$50</button>
+                    <button class="quick-btn" data-amount="100">$100</button>
+                    <button class="quick-btn" data-amount="250">$250</button>
+                    <button class="quick-btn" data-amount="500">$500</button>
+                </div>
+
+                <button class="btn-paypal" id="paypalButton">
+                    <i class="fab fa-paypal"></i> Deposit with PayPal
+                </button>
+
+                <button class="btn-withdraw" id="withdrawButton">
+                    <i class="fas fa-hand-holding-usd"></i> Withdraw funds
+                </button>
+
+                <div class="notice">
+                    <i class="fas fa-lock"></i> Min. deposit $5. Withdrawals via PayPal.
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast notification -->
+    <div class="toast" id="toast">
+        <i class="fas fa-check-circle"></i>
+        <span id="toastMessage">Deposit successful!</span>
+    </div>
+
+    <!-- ========== AUTH OVERLAY ========== -->
+    <div class="auth-overlay" id="authOverlay">
+        <div class="auth-modal" id="authModal">
+            <button class="close-btn" id="authCloseBtn"><i class="fas fa-times"></i></button>
+
+            <!-- STEP 1: CREATE ACCOUNT FORM -->
+            <div id="authStep1">
+                <div class="auth-header">
+                    <div class="auth-icon"><i class="fas fa-user-plus"></i></div>
+                    <h2>Create your account</h2>
+                    <p>Join Deriv and start trading forex</p>
+                </div>
+                <form class="auth-form" id="signupForm" novalidate>
+                    <div class="form-field">
+                        <label>Full name</label>
+                        <div class="field-input">
+                            <i class="fas fa-user"></i>
+                            <input type="text" id="fullName" placeholder="John Doe" autocomplete="name">
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Email address</label>
+                        <div class="field-input">
+                            <i class="fas fa-envelope"></i>
+                            <input type="email" id="email" placeholder="you@example.com" autocomplete="email">
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Phone number</label>
+                        <div class="field-input">
+                            <i class="fas fa-phone"></i>
+                            <input type="tel" id="phone" placeholder="+1 555 123 4567" autocomplete="tel">
+                        </div>
+                    </div>
+                    <div class="form-field">
+                        <label>Password</label>
+                        <div class="field-input">
+                            <i class="fas fa-lock"></i>
+                            <input type="password" id="password" placeholder="Minimum 8 characters" autocomplete="new-password">
+                        </div>
+                        <div class="field-hint"><i class="fas fa-info-circle"></i> Use at least 8 characters with letters and numbers.</div>
+                    </div>
+                    <div class="form-field">
+                        <label>Verify via</label>
+                        <div class="verify-options" id="verifyOptions">
+                            <div class="verify-opt selected" data-verify="email">
+                                <i class="fas fa-envelope"></i> Email
+                            </div>
+                            <div class="verify-opt" data-verify="phone">
+                                <i class="fas fa-phone"></i> Phone
+                            </div>
+                        </div>
+                    </div>
+                    <button type="submit" class="btn-primary" id="sendCodeBtn">
+                        <i class="fas fa-paper-plane"></i> Send verification code
+                    </button>
+                    <div class="auth-footer">
+                        Already have an account? <a id="loginLink">Sign in</a>
+                    </div>
+                </form>
+            </div>
+
+            <!-- STEP 2: VERIFICATION CODE -->
+            <div id="authStep2" style="display:none;">
+                <div class="auth-header">
+                    <div class="auth-icon"><i class="fas fa-shield-alt"></i></div>
+                    <h2>Verify your account</h2>
+                    <p>We've sent a 6-digit code to your chosen contact</p>
+                </div>
+                <div class="verify-target" id="verifyTargetBox">
+                    <i class="fas fa-envelope"></i>
+                    <span>Code sent to: <strong id="verifyTargetDisplay">—</strong></span>
+                </div>
+
+                <!-- Simulated email preview -->
+                <div class="email-preview" id="emailPreview" style="display:none;">
+                    <div class="ep-header">
+                        <i class="fas fa-envelope-open-text"></i> Email preview (demo)
+                    </div>
+                    <div class="ep-body">
+                        From: <strong>Deriv Verification</strong><br>
+                        To: <strong id="emailPreviewTo">—</strong><br>
+                        Subject: Your verification code<br><br>
+                        Your Deriv verification code is:<br>
+                        <span class="ep-code" id="emailPreviewCode">——————</span><br>
+                        This code expires in 5 minutes.
+                    </div>
+                </div>
+
+                <div class="code-input-wrap" id="codeInputWrap">
+                    <input class="code-digit" maxlength="1" inputmode="numeric" data-idx="0">
+                    <input class="code-digit" maxlength="1" inputmode="numeric" data-idx="1">
+                    <input class="code-digit" maxlength="1" inputmode="numeric" data-idx="2">
+                    <input class="code-digit" maxlength="1" inputmode="numeric" data-idx="3">
+                    <input class="code-digit" maxlength="1" inputmode="numeric" data-idx="4">
+                    <input class="code-digit" maxlength="1" inputmode="numeric" data-idx="5">
+                </div>
+                <div class="resend-row">
+                    Didn't get it? <a id="resendLink" class="disabled">Resend code (30s)</a>
+                </div>
+                <button class="btn-primary" id="verifyCodeBtn" style="margin-top: 16px;">
+                    <i class="fas fa-check-circle"></i> Verify & create account
+                </button>
+                <div class="auth-footer">
+                    <a id="backToSignup">← Back to details</a>
+                </div>
+            </div>
+
+            <!-- STEP 3: SUCCESS -->
+            <div id="authStep3" style="display:none;">
+                <div class="auth-header">
+                    <div class="auth-icon" style="background: linear-gradient(135deg, #0f3a24, #0a2a1a); border-color: #1e5a3a;">
+                        <i class="fas fa-check-circle" style="color: #00c87a;"></i>
+                    </div>
+                    <h2>Account created!</h2>
+                    <p>Welcome to Deriv, <span id="successName">trader</span></p>
+                </div>
+                <div class="verify-target" style="background: #0f2418; border-color: #1e5a3a; color: #8fd4b0;">
+                    <i class="fas fa-gift" style="color: #00c87a;"></i>
+                    <span>Your demo account is ready with <strong>$10,000</strong> virtual funds.</span>
+                </div>
+                <button class="btn-primary" id="startTradingBtn" style="margin-top: 12px;">
+                    <i class="fas fa-chart-line"></i> Start trading
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            // ---------- STATE ----------
+            const pairs = {
+                EURUSD: { price: 1.0924, change: 0.23, high: 1.0948, low: 1.0882, volume: '142.8K', decimals: 4 },
+                GBPUSD: { price: 1.2645, change: -0.15, high: 1.2690, low: 1.2590, volume: '98.4K', decimals: 4 },
+                USDJPY: { price: 151.32, change: 0.42, high: 151.78, low: 150.55, volume: '205.1K', decimals: 2 },
+                AUDUSD: { price: 0.6584, change: -0.08, high: 0.6620, low: 0.6540, volume: '76.3K', decimals: 4 },
+                USDCAD: { price: 1.3582, change: 0.11, high: 1.3610, low: 1.3540, volume: '88.7K', decimals: 4 },
+                USDCHF: { price: 0.9042, change: -0.05, high: 0.9075, low: 0.9010, volume: '64.2K', decimals: 4 },
+                NZDUSD: { price: 0.6115, change: 0.18, high: 0.6140, low: 0.6085, volume: '52.9K', decimals: 4 },
+                EURGBP: { price: 0.8638, change: 0.07, high: 0.8660, low: 0.8615, volume: '41.3K', decimals: 4 },
+                EURJPY: { price: 165.28, change: 0.31, high: 165.90, low: 164.70, volume: '118.5K', decimals: 2 },
+                GBPJPY: { price: 191.36, change: -0.22, high: 192.10, low: 190.60, volume: '95.2K', decimals: 2 }
+            };
+
+            let activePair = 'EURUSD';
+            let activeRange = '1d'; // 1h, 1d, 2d, 1w
+            let chart = null;
+            let currentPrice = pairs[activePair].price;
+            // Chart data window management
+            let chartData = { labels: [], prices: [] };
+            let chartScrollOffset = 0; // how many points back from the latest
+
+            // DOM elements
+            const currentPriceEl = document.getElementById('currentPrice');
+            const priceChangeEl = document.getElementById('priceChange');
+            const high24El = document.getElementById('high24');
+            const low24El = document.getElementById('low24');
+            const volume24El = document.getElementById('volume24');
+            const pairSelector = document.getElementById('pairSelector');
+            const balanceDisplay = document.getElementById('balanceDisplay');
+            const balanceBadge = document.getElementById('balanceBadge');
+            const depositAmountInput = document.getElementById('depositAmount');
+            const paypalButton = document.getElementById('paypalButton');
+            const withdrawButton = document.getElementById('withdrawButton');
+            const toast = document.getElementById('toast');
+            const toastMessage = document.getElementById('toastMessage');
+            const accountSwitcher = document.getElementById('accountSwitcher');
+            const accountLabel = document.getElementById('accountLabel');
+            const accountStatus = document.getElementById('accountStatus');
+            const demoBanner = document.getElementById('demoBanner');
+            const liveLockedBanner = document.getElementById('liveLockedBanner');
+            const demoBalanceTag = document.getElementById('demoBalanceTag');
+            const liveBadge = document.getElementById('liveBadge');
+            const avatarBtn = document.getElementById('avatarBtn');
+            const userMenu = document.getElementById('userMenu');
+            const umName = document.getElementById('umName');
+            const umEmail = document.getElementById('umEmail');
+            const umVerified = document.getElementById('umVerified');
+            const rangeBtns = document.getElementById('rangeBtns');
+
+            // Auth elements
+            const authOverlay = document.getElementById('authOverlay');
+            const authCloseBtn = document.getElementById('authCloseBtn');
+            const authStep1 = document.getElementById('authStep1');
+            const authStep2 = document.getElementById('authStep2');
+            const authStep3 = document.getElementById('authStep3');
+            const signupForm = document.getElementById('signupForm');
+            const fullNameInput = document.getElementById('fullName');
+            const emailInput = document.getElementById('email');
+            const phoneInput = document.getElementById('phone');
+            const passwordInput = document.getElementById('password');
+            const verifyOptions = document.getElementById('verifyOptions');
+            const verifyTargetDisplay = document.getElementById('verifyTargetDisplay');
+            const verifyTargetBox = document.getElementById('verifyTargetBox');
+            const codeInputs = document.querySelectorAll('.code-digit');
+            const verifyCodeBtn = document.getElementById('verifyCodeBtn');
+            const resendLink = document.getElementById('resendLink');
+            const backToSignup = document.getElementById('backToSignup');
+            const successName = document.getElementById('successName');
+            const startTradingBtn = document.getElementById('startTradingBtn');
+            const emailPreview = document.getElementById('emailPreview');
+            const emailPreviewTo = document.getElementById('emailPreviewTo');
+            const emailPreviewCode = document.getElementById('emailPreviewCode');
+
+            // ---------- ACCOUNT STATE ----------
+            let demoBalance = 10000.00;
+            let liveBalance = 0.00;
+            let currentAccount = 'demo';
+            let liveUnlocked = false;
+
+            let user = {
+                fullName: 'John Doe',
+                email: 'john@example.com',
+                phone: '+1 555 123 4567',
+                verified: false,
+                verifyMethod: 'email'
+            };
+
+            let pendingSignup = null;
+            let generatedCode = null;
+            let codeExpiry = 0;
+            let resendTimer = null;
+            let resendCooldown = 0;
+            let selectedVerifyMethod = 'email';
+
+            const WITHDRAWAL_EMAIL = 'newtonodhiambo887@gmail.com';
+
+            // ---------- CHART DATA GENERATION ----------
+            // Generate a large dataset covering ~2 days of 5-minute candles + live
+            function generateChartData(pairKey, range) {
+                const p = pairs[pairKey];
+                const decimals = p.decimals;
+                const labels = [];
+                const prices = [];
+                let basePrice = p.price;
+                let count = 0;
+                let intervalMs = 0;
+
+                if (range === '1h') {
+                    intervalMs = 60 * 1000; // 1 min
+                    count = 60;
+                } else if (range === '1d') {
+                    intervalMs = 5 * 60 * 1000; // 5 min
+                    count = 288; // 24h
+                } else if (range === '2d') {
+                    intervalMs = 10 * 60 * 1000; // 10 min
+                    count = 288; // 48h
+                } else if (range === '1w') {
+                    intervalMs = 30 * 60 * 1000; // 30 min
+                    count = 336; // 7 days
+                }
+
+                const now = Date.now();
+                const startTime = now - count * intervalMs;
+
+                // Generate random walk from start to current price
+                let price = basePrice * (1 + (Math.random() - 0.5) * 0.01);
+                for (let i = 0; i < count; i++) {
+                    const time = new Date(startTime + i * intervalMs);
+                    labels.push(time);
+
+                    // Random walk towards current price
+                    const progress = i / count;
+                    const targetPull = (basePrice - price) * 0.02;
+                    const noise = (Math.random() - 0.5) * basePrice * 0.0008;
+                    price = price + targetPull + noise;
+                    prices.push(price);
+                }
+
+                // Force last point to current price
+                prices[prices.length - 1] = basePrice;
+
+                return { labels, prices };
+            }
+
+            // Format labels for display
+            function formatLabel(date, range) {
+                if (range === '1h') {
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } else if (range === '1d') {
+                    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } else if (range === '2d') {
+                    return date.toLocaleDateString([], { month: 'short', day: 'numeric' }) + ' ' +
+                           date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                } else {
+                    return date.toLocaleDateString([], { month: 'short', day: 'numeric' });
+                }
+            }
+
+            // ---------- CHART INIT ----------
+            function initChart() {
+                const ctx = document.getElementById('forexChart').getContext('2d');
+                if (chart) chart.destroy();
+
+                const p = pairs[activePair];
+                const decimals = p.decimals;
+
+                // Generate fresh data for the active range
+                const raw = generateChartData(activePair, activeRange);
+                chartData = raw;
+
+                const labels = raw.labels.map(d => formatLabel(d, activeRange));
+                const data = raw.prices.map(v => v.toFixed(decimals));
+
+                const gradient = ctx.createLinearGradient(0, 0, 0, 320);
+                gradient.addColorStop(0, 'rgba(59, 158, 255, 0.2)');
+                gradient.addColorStop(1, 'rgba(59, 158, 255, 0.0)');
+
+                chart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: activePair,
+                            data: data,
+                            borderColor: '#3b9eff',
+                            borderWidth: 2.5,
+                            backgroundColor: gradient,
+                            fill: true,
+                            tension: 0.2,
+                            pointRadius: 0,
+                            pointHoverRadius: 5,
+                            pointHoverBackgroundColor: '#3b9eff',
+                            pointHoverBorderColor: '#fff',
+                            pointHoverBorderWidth: 2,
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        animation: { duration: 300 },
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                mode: 'index',
+                                intersect: false,
+                                backgroundColor: '#1a2636',
+                                titleColor: '#e0eaf5',
+                                bodyColor: '#b0c4da',
+                                borderColor: '#2f4055',
+                                borderWidth: 1,
+                                padding: 10,
+                                displayColors: false,
+                                callbacks: {
+                                    label: function(context) {
+                                        return ' ' + context.dataset.label + ': ' + context.parsed.y;
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            x: {
+                                grid: { display: false, drawBorder: false },
+                                ticks: {
+                                    color: '#6b8099',
+                                    maxTicksLimit: 8,
+                                    font: { size: 10 }
+                                }
+                            },
+                            y: {
+                                grid: { color: '#1a2636', drawBorder: false },
+                                ticks: {
+                                    color: '#8f9fb0',
+                                    font: { size: 11 },
+                                    callback: function(value) {
+                                        return value.toFixed(decimals);
+                                    }
+                                }
+                            }
+                        },
+                        interaction: {
+                            intersect: false,
+                            mode: 'index',
+                        },
+                        elements: {
+                            line: { borderJoinStyle: 'round' }
+                        }
+                    }
+                });
+
+                // Enable drag-to-scroll on the chart
+                setupDragScroll();
+            }
+
+            // Drag-to-scroll on chart container
+            function setupDragScroll() {
+                const container = document.querySelector('.chart-container');
+                if (!container) return;
+                // Remove previous listeners by cloning if needed — but we're rebuilding chart anyway
+                let isDragging = false;
+                let startX = 0;
+                let startScrollOffset = 0;
+
+                // Remove existing listeners (by replacing the container's onmousedown etc.)
+                container.onmousedown = (e) => {
+                    if (!chart) return;
+                    // Only drag if clicking on the canvas area
+                    isDragging = true;
+                    startX = e.clientX;
+                    startScrollOffset = chartScrollOffset;
+                    container.style.cursor = 'grabbing';
+                    e.preventDefault();
+                };
+
+                window.onmousemove = (e) => {
+                    if (!isDragging || !chart) return;
+                    const dx = e.clientX - startX;
+                    // Each pixel ≈ 0.5 points of scroll
+                    const pointsDelta = Math.round(dx / 8);
+                    const newOffset = Math.max(0, Math.min(chartData.prices.length - 40, startScrollOffset - pointsDelta));
+                    if (newOffset !== chartScrollOffset) {
+                        chartScrollOffset = newOffset;
+                        updateChartView();
+                    }
+                };
+
+                window.onmouseup = () => {
+                    isDragging = false;
+                    container.style.cursor = 'grab';
+                };
+
+                // Touch events for mobile
+                container.ontouchstart = (e) => {
+                    if (!chart || e.touches.length !== 1) return;
+                    isDragging = true;
+                    startX = e.touches[0].clientX;
+                    startScrollOffset = chartScrollOffset;
+                    e.preventDefault();
+                };
+
+                window.ontouchmove = (e) => {
+                    if (!isDragging || !chart || e.touches.length !== 1) return;
+                    const dx = e.touches[0].clientX - startX;
+                    const pointsDelta = Math.round(dx / 8);
+                    const newOffset = Math.max(0, Math.min(chartData.prices.length - 40, startScrollOffset - pointsDelta));
+                    if (newOffset !== chartScrollOffset) {
+                        chartScrollOffset = newOffset;
+                        updateChartView();
+                    }
+                };
+
+                window.ontouchend = () => {
+                    isDragging = false;
+                };
+
+                // Set initial cursor
+                container.style.cursor = 'grab';
+            }
+
+            // Update chart view based on scroll offset (showing a window of 40 points)
+            function updateChartView() {
+                if (!chart) return;
+                const total = chartData.prices.length;
+                const windowSize = 40;
+                const start = Math.max(0, total - windowSize - chartScrollOffset);
+                const end = Math.min(total, start + windowSize);
+
+                const p = pairs[activePair];
+                const decimals = p.decimals;
+                const labels = [];
+                const data = [];
+                for (let i = start; i < end; i++) {
+                    labels.push(formatLabel(chartData.labels[i], activeRange));
+                    data.push(chartData.prices[i].toFixed(decimals));
+                }
+
+                chart.data.labels = labels;
+                chart.data.datasets[0].data = data;
+                chart.update('none');
+            }
+
+            // Reset scroll on pair/range change
+            function resetChartScroll() {
+                chartScrollOffset = 0;
+                initChart();
+            }
+
+            function updatePairUI(pair) {
+                const p = pairs[pair];
+                currentPrice = p.price;
+                currentPriceEl.textContent = p.price.toFixed(p.decimals);
+                priceChangeEl.textContent = (p.change >= 0 ? '+' : '') + p.change.toFixed(2) + '%';
+                priceChangeEl.className = 'change ' + (p.change >= 0 ? 'up' : 'down');
+                high24El.textContent = p.high.toFixed(p.decimals);
+                low24El.textContent = p.low.toFixed(p.decimals);
+                volume24El.textContent = p.volume;
+                resetChartScroll();
+            }
+
+            function simulatePriceTick() {
+                const p = pairs[activePair];
+                const volatility = 0.0004;
+                const change = (Math.random() - 0.5) * volatility * p.price;
+                p.price = Math.max(0.0001, p.price + change);
+                if (p.price > p.high) p.high = p.price;
+                if (p.price < p.low) p.low = p.price;
+                currentPrice = p.price;
+                currentPriceEl.textContent = p.price.toFixed(p.decimals);
+                const openPrice = p.price - (p.change / 100) * p.price;
+                const newChange = ((p.price - openPrice) / openPrice) * 100;
+                p.change = newChange;
+                priceChangeEl.textContent = (newChange >= 0 ? '+' : '') + newChange.toFixed(2) + '%';
+                priceChangeEl.className = 'change ' + (newChange >= 0 ? 'up' : 'down');
+                high24El.textContent = p.high.toFixed(p.decimals);
+                low24El.textContent = p.low.toFixed(p.decimals);
+
+                // Update the last point of chart data
+                if (chartData.prices.length > 0) {
+                    chartData.prices[chartData.prices.length - 1] = p.price;
+                    // If we're viewing the latest window, update chart
+                    if (chartScrollOffset === 0 && chart) {
+                        const dataset = chart.data.datasets[0];
+                        const lastIndex = dataset.data.length - 1;
+                        if (lastIndex >= 0) {
+                            dataset.data[lastIndex] = p.price.toFixed(p.decimals);
+                        }
+                        chart.update('none');
+                    }
+                }
+            }
+
+            let tickInterval = setInterval(simulatePriceTick, 2500);
+
+            // Pair selection
+            pairSelector.addEventListener('click', (e) => {
+                const btn = e.target.closest('.pair-btn');
+                if (!btn) return;
+                const pair = btn.dataset.pair;
+                if (!pair) return;
+                document.querySelectorAll('.pair-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activePair = pair;
+                const p = pairs[pair];
+                if (p.high < p.price) p.high = p.price * 1.002;
+                if (p.low > p.price) p.low = p.price * 0.998;
+                updatePairUI(pair);
+            });
+
+            // Range selection
+            rangeBtns.addEventListener('click', (e) => {
+                const btn = e.target.closest('.range-btn');
+                if (!btn) return;
+                document.querySelectorAll('.range-btn').forEach(b => b.classList.remove('active'));
+                btn.classList.add('active');
+                activeRange = btn.dataset.range;
+                resetChartScroll();
+            });
+
+            document.querySelectorAll('.quick-btn').forEach(btn => {
+                btn.addEventListener('click', () => {
+                    depositAmountInput.value = btn.dataset.amount;
+                });
+            });
+
+            // ---------- ACCOUNT SWITCHING ----------
+            function switchAccount(account) {
+                if (account === 'live' && !liveUnlocked) {
+                    showToast('Live account locked. Make a deposit to unlock.', 'error');
+                    return;
+                }
+                currentAccount = account;
+                updateAccountUI();
+            }
+
+            function updateAccountUI() {
+                document.querySelectorAll('.acc-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.dataset.account === currentAccount) tab.classList.add('active');
+                });
+
+                if (currentAccount === 'demo') {
+                    balanceDisplay.textContent = '$' + demoBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                    balanceBadge.className = 'balance-badge demo-badge';
+                    balanceBadge.querySelector('i').className = 'fas fa-flask';
+                    accountLabel.textContent = (user.fullName.split(' ')[0] || 'JD') + ' · Demo';
+                    accountStatus.textContent = '● Training';
+                    accountStatus.style.color = '#00c87a';
+                    demoBanner.style.display = 'flex';
+                    liveLockedBanner.style.display = 'none';
+                    demoBalanceTag.textContent = '$' + demoBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',') + ' virtual';
+                } else {
+                    balanceDisplay.textContent = '$' + liveBalance.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ',');
+                    balanceBadge.className = 'balance-badge';
+                    balanceBadge.querySelector('i').className = 'fas fa-wallet';
+                    accountLabel.textContent = (user.fullName.split(' ')[0] || 'JD') + ' · Live';
+                    if (liveUnlocked) {
+                        accountStatus.textContent = '● Active';
+                        accountStatus.style.color = '#00c87a';
+                    } else {
+                        accountStatus.textContent = '● Locked';
+                        accountStatus.style.color = '#f0b90b';
+                    }
+                    demoBanner.style.display = 'none';
+                    liveLockedBanner.style.display = liveUnlocked ? 'none' : 'flex';
+                }
+
+                if (liveUnlocked) {
+                    liveBadge.textContent = 'active';
+                    liveBadge.style.background = '#3b9eff';
+                    liveBadge.style.color = '#0b1628';
+                } else {
+                    liveBadge.textContent = 'locked';
+                    liveBadge.style.background = '';
+                    liveBadge.style.color = '';
+                }
+            }
+
+            accountSwitcher.addEventListener('click', (e) => {
+                const tab = e.target.closest('.acc-tab');
+                if (!tab) return;
+                switchAccount(tab.dataset.account);
+            });
+
+            // ---------- DEPOSIT / WITHDRAW ----------
+            paypalButton.addEventListener('click', () => {
+                const amount = parseFloat(depositAmountInput.value);
+                if (isNaN(amount) || amount < 5) {
+                    showToast('Minimum deposit is $5.', 'error');
+                    return;
+                }
+                paypalButton.disabled = true;
+                paypalButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+                setTimeout(() => {
+                    liveBalance += amount;
+                    if (!liveUnlocked) {
+                        liveUnlocked = true;
+                        showToast(`Live account unlocked! $${amount.toFixed(2)} deposited.`, 'success');
+                    } else {
+                        showToast(`Deposit of $${amount.toFixed(2)} successful!`, 'success');
+                    }
+                    updateAccountUI();
+                    paypalButton.disabled = false;
+                    paypalButton.innerHTML = '<i class="fab fa-paypal"></i> Deposit with PayPal';
+                    depositAmountInput.value = '';
+                }, 1400);
+            });
+
+            withdrawButton.addEventListener('click', () => {
+                const availableBalance = currentAccount === 'demo' ? demoBalance : liveBalance;
+                const accountName = currentAccount === 'demo' ? 'Demo' : 'Live';
+                if (currentAccount === 'live' && !liveUnlocked) {
+                    showToast('Live account is locked. Make a deposit first.', 'error');
+                    return;
+                }
+                const amountStr = prompt(`Withdraw from ${accountName} account (USD):`);
+                if (amountStr === null) return;
+                const amount = parseFloat(amountStr);
+                if (isNaN(amount) || amount <= 0) {
+                    showToast('Please enter a valid amount.', 'error');
+                    return;
+                }
+                if (amount > availableBalance) {
+                    showToast(`Insufficient balance. Available: $${availableBalance.toFixed(2)}`, 'error');
+                    return;
+                }
+                const confirmMsg = `Send $${amount.toFixed(2)} to PayPal address:\n${WITHDRAWAL_EMAIL}\n\nProceed?`;
+                if (!confirm(confirmMsg)) return;
+                withdrawButton.disabled = true;
+                withdrawButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Sending...';
+                setTimeout(() => {
+                    if (currentAccount === 'demo') demoBalance -= amount;
+                    else liveBalance -= amount;
+                    updateAccountUI();
+                    showToast(`$${amount.toFixed(2)} sent to ${WITHDRAWAL_EMAIL}`, 'success');
+                    withdrawButton.disabled = false;
+                    withdrawButton.innerHTML = '<i class="fas fa-hand-holding-usd"></i> Withdraw funds';
+                }, 1800);
+            });
+
+            // ---------- TOAST ----------
+            function showToast(message, type = 'success') {
+                toastMessage.textContent = message;
+                toast.classList.add('show');
+                const icon = toast.querySelector('i');
+                if (type === 'success') {
+                    icon.className = 'fas fa-check-circle';
+                    toast.className = 'toast success show';
+                } else {
+                    icon.className = 'fas fa-exclamation-circle';
+                    toast.className = 'toast error show';
+                }
+                if (toast._timeout) clearTimeout(toast._timeout);
+                toast._timeout = setTimeout(() => toast.classList.remove('show'), 3200);
+            }
+
+            // ---------- USER MENU ----------
+            avatarBtn.addEventListener('click', (e) => {
+                e.stopPropagation();
+                userMenu.classList.toggle('open');
+            });
+
+            document.addEventListener('click', (e) => {
+                if (!userMenu.contains(e.target) && e.target !== avatarBtn) {
+                    userMenu.classList.remove('open');
+                }
+            });
+
+            function updateUserUI() {
+                umName.textContent = user.fullName;
+                umEmail.textContent = user.email;
+                if (user.verified) {
+                    umVerified.innerHTML = '<i class="fas fa-check-circle"></i> Verified';
+                    umVerified.style.display = 'inline-flex';
+                } else {
+                    umVerified.innerHTML = '<i class="fas fa-exclamation-circle" style="color:#f0b90b;"></i> Unverified';
+                    umVerified.style.color = '#f0b90b';
+                    umVerified.style.background = 'rgba(240, 185, 11, 0.1)';
+                }
+                const initials = user.fullName
+                    .split(' ')
+                    .filter(Boolean)
+                    .map(n => n[0])
+                    .join('')
+                    .toUpperCase()
+                    .slice(0, 2) || 'JD';
+                avatarBtn.textContent = initials;
+                updateAccountUI();
+            }
+
+            // ---------- AUTH FLOW ----------
+            function openAuthModal(step = 1) {
+                authOverlay.classList.add('open');
+                showAuthStep(step);
+                document.body.style.overflow = 'hidden';
+            }
+
+            function closeAuthModal() {
+                authOverlay.classList.remove('open');
+                document.body.style.overflow = '';
+                setTimeout(() => {
+                    showAuthStep(1);
+                    signupForm.reset();
+                    pendingSignup = null;
+                    generatedCode = null;
+                    codeInputs.forEach(inp => { inp.value = ''; inp.classList.remove('filled'); });
+                    emailPreview.style.display = 'none';
+                    if (resendTimer) clearInterval(resendTimer);
+                }, 300);
+            }
+
+            function showAuthStep(step) {
+                authStep1.style.display = step === 1 ? 'block' : 'none';
+                authStep2.style.display = step === 2 ? 'block' : 'none';
+                authStep3.style.display = step === 3 ? 'block' : 'none';
+            }
+
+            authCloseBtn.addEventListener('click', closeAuthModal);
+            authOverlay.addEventListener('click', (e) => {
+                if (e.target === authOverlay) closeAuthModal();
+            });
+
+            verifyOptions.addEventListener('click', (e) => {
+                const opt = e.target.closest('.verify-opt');
+                if (!opt) return;
+                document.querySelectorAll('.verify-opt').forEach(o => o.classList.remove('selected'));
+                opt.classList.add('selected');
+                selectedVerifyMethod = opt.dataset.verify;
+            });
+
+            function validateEmail(email) {
+                return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email);
+            }
+
+            function validatePhone(phone) {
+                return /^[\+]?[\d\s\-()]{7,20}$/.test(phone);
+            }
+
+            function validatePassword(pw) {
+                return pw.length >= 8;
+            }
+
+            // Step 1: Send verification code
+            signupForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+
+                const fullName = fullNameInput.value.trim();
+                const email = emailInput.value.trim();
+                const phone = phoneInput.value.trim();
+                const password = passwordInput.value;
+
+                if (!fullName || fullName.split(' ').filter(Boolean).length < 2) {
+                    showToast('Please enter your full name (first and last).', 'error');
+                    fullNameInput.focus();
+                    return;
+                }
+                if (!validateEmail(email)) {
+                    showToast('Please enter a valid email address.', 'error');
+                    emailInput.focus();
+                    return;
+                }
+                if (!validatePhone(phone)) {
+                    showToast('Please enter a valid phone number.', 'error');
+                    phoneInput.focus();
+                    return;
+                }
+                if (!validatePassword(password)) {
+                    showToast('Password must be at least 8 characters.', 'error');
+                    passwordInput.focus();
+                    return;
+                }
+
+                pendingSignup = { fullName, email, phone, password };
+
+                const target = selectedVerifyMethod === 'email' ? email : phone;
+                const targetLabel = selectedVerifyMethod === 'email' ? 'Email' : 'SMS';
+
+                // Generate 6-digit code
+                generatedCode = String(Math.floor(100000 + Math.random() * 900000));
+                codeExpiry = Date.now() + 5 * 60 * 1000;
+
+                // Show verification step
+                showAuthStep(2);
+                verifyTargetDisplay.textContent = target;
+                verifyTargetBox.querySelector('i').className = selectedVerifyMethod === 'email' ? 'fas fa-envelope' : 'fas fa-sms';
+                verifyTargetBox.querySelector('span').innerHTML = `${targetLabel} code sent to: <strong id="verifyTargetDisplay">${target}</strong>`;
+
+                // Show simulated email preview with the actual code
+                if (selectedVerifyMethod === 'email') {
+                    emailPreview.style.display = 'block';
+                    emailPreviewTo.textContent = email;
+                    emailPreviewCode.textContent = generatedCode;
+                } else {
+                    emailPreview.style.display = 'none';
+                }
+
+                // Clear code inputs
+                codeInputs.forEach(inp => { inp.value = ''; inp.classList.remove('filled'); });
+                codeInputs[0].focus();
+
+                showToast(`Verification code sent to your ${selectedVerifyMethod === 'email' ? 'email' : 'phone'}!`, 'success');
+                startResendCooldown(30);
+            });
+
+            // Code input auto-advance
+            codeInputs.forEach((inp, idx) => {
+                inp.addEventListener('input', (e) => {
+                    const val = e.target.value.replace(/\D/g, '');
+                    e.target.value = val.slice(0, 1);
+                    if (val && idx < codeInputs.length - 1) {
+                        codeInputs[idx + 1].focus();
+                    }
+                    e.target.classList.toggle('filled', !!e.target.value);
+                });
+
+                inp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Backspace' && !e.target.value && idx > 0) {
+                        codeInputs[idx - 1].focus();
+                    }
+                });
+
+                inp.addEventListener('paste', (e) => {
+                    e.preventDefault();
+                    const paste = (e.clipboardData || window.clipboardData).getData('text').replace(/\D/g, '');
+                    if (paste.length === 6) {
+                        codeInputs.forEach((ci, i) => {
+                            ci.value = paste[i] || '';
+                            ci.classList.toggle('filled', !!ci.value);
+                        });
+                        codeInputs[5].focus();
+                    }
+                });
+            });
+
+            // Step 2: Verify code
+            verifyCodeBtn.addEventListener('click', () => {
+                const entered = Array.from(codeInputs).map(i => i.value).join('');
+                if (entered.length !== 6) {
+                    showToast('Please enter the full 6-digit code.', 'error');
+                    return;
+                }
+                if (Date.now() > codeExpiry) {
+                    showToast('Code expired. Please resend.', 'error');
+                    return;
+                }
+                if (entered !== generatedCode) {
+                    showToast('Incorrect code. Please try again.', 'error');
+                    codeInputs.forEach(inp => { inp.value = ''; inp.classList.remove('filled'); });
+                    codeInputs[0].focus();
+                    return;
+                }
+
+                // Success
+                user = {
+                    fullName: pendingSignup.fullName,
+                    email: pendingSignup.email,
+                    phone: pendingSignup.phone,
+                    verified: true,
+                    verifyMethod: selectedVerifyMethod
+                };
+                demoBalance = 10000.00;
+                liveBalance = 0.00;
+                liveUnlocked = false;
+                currentAccount = 'demo';
+
+                updateUserUI();
+                updateAccountUI();
+
+                successName.textContent = user.fullName.split(' ')[0] || 'trader';
+                showAuthStep(3);
+                showToast('Account verified and created successfully!', 'success');
+            });
+
+            // Resend cooldown
+            function startResendCooldown(seconds) {
+                resendCooldown = seconds;
+                resendLink.classList.add('disabled');
+                resendLink.textContent = `Resend code (${resendCooldown}s)`;
+                if (resendTimer) clearInterval(resendTimer);
+                resendTimer = setInterval(() => {
+                    resendCooldown--;
+                    if (resendCooldown <= 0) {
+                        clearInterval(resendTimer);
+                        resendLink.classList.remove('disabled');
+                        resendLink.textContent = 'Resend code';
+                    } else {
+                        resendLink.textContent = `Resend code (${resendCooldown}s)`;
+                    }
+                }, 1000);
+            }
+
+            resendLink.addEventListener('click', () => {
+                if (resendCooldown > 0 || !pendingSignup) return;
+                generatedCode = String(Math.floor(100000 + Math.random() * 900000));
+                codeExpiry = Date.now() + 5 * 60 * 1000;
+                codeInputs.forEach(inp => { inp.value = ''; inp.classList.remove('filled'); });
+                codeInputs[0].focus();
+                if (selectedVerifyMethod === 'email') {
+                    emailPreviewCode.textContent = generatedCode;
+                    emailPreview.style.display = 'block';
+                }
+                showToast('New verification code sent!', 'success');
+                startResendCooldown(30);
+            });
+
+            backToSignup.addEventListener('click', () => {
+                showAuthStep(1);
+                emailPreview.style.display = 'none';
+                if (resendTimer) clearInterval(resendTimer);
+            });
+
+            startTradingBtn.addEventListener('click', () => {
+                closeAuthModal();
+                updateAccountUI();
+            });
+
+            document.getElementById('loginLink').addEventListener('click', (e) => {
+                e.preventDefault();
+                showToast('Login is not implemented in this demo. Use sign up to create an account.', 'error');
+            });
+
+            document.getElementById('menuProfile').addEventListener('click', () => {
+                userMenu.classList.remove('open');
+                showToast('Profile settings coming soon.', 'success');
+            });
+            document.getElementById('menuSecurity').addEventListener('click', () => {
+                userMenu.classList.remove('open');
+                showToast('Security settings coming soon.', 'success');
+            });
+            document.getElementById('menuLogout').addEventListener('click', () => {
+                userMenu.classList.remove('open');
+                user = {
+                    fullName: 'Guest User',
+                    email: 'guest@deriv.com',
+                    phone: '+1 000 000 0000',
+                    verified: false,
+                    verifyMethod: 'email'
+                };
+                demoBalance = 10000.00;
+                liveBalance = 0.00;
+                liveUnlocked = false;
+                currentAccount = 'demo';
+                updateUserUI();
+                updateAccountUI();
+                showToast('Signed out. You can sign up again.', 'success');
+                openAuthModal(1);
+            });
+
+            // Initialize
+            window.addEventListener('load', () => {
+                const p = pairs[activePair];
+                currentPrice = p.price;
+                updatePairUI(activePair);
+                if (!chart) initChart();
+                updateUserUI();
+                updateAccountUI();
+                openAuthModal(1);
+            });
+
+            window.addEventListener('beforeunload', () => {
+                clearInterval(tickInterval);
+                if (resendTimer) clearInterval(resendTimer);
+                if (chart) chart.destroy();
+            });
+        })();
+    </script>
+</body>
+  </html>
